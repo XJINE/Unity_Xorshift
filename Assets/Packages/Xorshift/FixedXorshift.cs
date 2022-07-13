@@ -70,7 +70,7 @@ public static class FixedXorshift
 
     public static int Range(in int min, in int max)
     {
-        return (int)(min + (max - min) * Value);
+        return (int)(min + (max - min) * Value - 0.5f);
     }
 
     public static float Range(in float min, in float max)

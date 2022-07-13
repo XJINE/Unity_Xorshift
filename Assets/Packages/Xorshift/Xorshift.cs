@@ -130,7 +130,7 @@ public class Xorshift
 
     public int Range(in int min, in int max)
     {
-        return (int)(min + (max - min) * Value);
+        return (int)(min + (max - min) * Value - 0.5f);
     }
 
     public float Range(in float min, in float max)
