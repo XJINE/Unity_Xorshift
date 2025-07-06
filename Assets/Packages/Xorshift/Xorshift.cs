@@ -1,13 +1,16 @@
-﻿// NOTE:
-// https://www.jstatsoft.org/article/view/v008i14
-// This is implement of xor128 case.
-// There is a little biased in a small number of trials.
-
+﻿using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class Xorshift
 {
+    // NOTE:
+    // https://www.jstatsoft.org/article/view/v008i14
+    // This is implement of xor128 case.
+    // There is a little biased in a small number of trials.
+
     #region Field
+
+    public static readonly Xorshift Instance = new (SeedW);
 
     private const float RadianMin = 0;
     private const float RadianMax = 6.283185307179586f;
@@ -21,8 +24,6 @@ public class Xorshift
 
     private uint _x, _y, _z, _w;
 
-    public static readonly Xorshift Instance = new (SeedW);
-
     #endregion Field
 
     #region Property
@@ -32,6 +33,7 @@ public class Xorshift
         // NOTE:
         // Return 0 ~ 2^32-1(uint.MaxValue) value.
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             var t = _x ^ (_x << 11);
@@ -47,27 +49,25 @@ public class Xorshift
 
     public float Value
     {
-        // NOTE:
-        // Do not use ValueNative to make this fast.
-
-        get
-        {
-            var t = _x ^ (_x << 11);
-
-            _x = _y;
-            _y = _z;
-            _z = _w;
-            _w = (_w ^ (_w >> 19)) ^ (t ^ (t >> 8));
-
-            return _w / UintMax;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => ValueNative / UintMax;
     }
 
-    public float Radian => Range(RadianMin, RadianMax);
-    public int   Sign   => Range(0, 2) == 0 ? -1 : 1; 
+    public float Radian
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Range(RadianMin, RadianMax);
+    }
+
+    public int Sign
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Range(0, 2) == 0 ? -1 : 1;
+    }
 
     public Vector2 OnUnitCircle
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             var radian = Radian;
@@ -77,6 +77,7 @@ public class Xorshift
 
     public Vector2 InsideUnitCircle
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             var radian = Radian;
@@ -87,6 +88,7 @@ public class Xorshift
 
     public Vector3 OnUnitSphere
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             var angle1 = Radian;
@@ -99,10 +101,8 @@ public class Xorshift
 
     public Vector3 InsideUnitSphere
     {
-        get
-        {
-            return OnUnitSphere * Value;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => OnUnitSphere * Value;
     }
 
     #endregion Property
@@ -128,52 +128,62 @@ public class Xorshift
     // If argument type is int, the result excludes max value.
     // If argument type is float, the result includes max value.
 
-    public int Range(in int min, in int max)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Range(int min, int max)
     {
         return (int)(min + (max - min) * Value - 0.5f);
     }
 
-    public float Range(in float min, in float max)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float Range(float min, float max)
     {
         return min + (max - min) * Value;
     }
 
-    public float Range(in Vector2 range)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float Range(Vector2 range)
     {
         return Range(range.x, range.y);
     }
 
-    public Vector2 Range(in Vector2 min, in Vector2 max)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Range(Vector2 min, Vector2 max)
     {
         return new Vector2(Range(min.x, max.x), Range(min.y, max.y));
     }
 
-    public Vector2Int Range(in Vector2Int min, in Vector2Int max)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2Int Range(Vector2Int min, Vector2Int max)
     {
         return new Vector2Int(Range(min.x, max.x), Range(min.y, max.y));
     }
 
-    public Vector3 Range(in Vector3 min, in Vector3 max)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3 Range(Vector3 min, Vector3 max)
     {
         return new Vector3(Range(min.x, max.x), Range(min.y, max.y), Range(min.z, max.z));
     }
 
-    public Vector3Int Range(in Vector3Int min, in Vector3Int max)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3Int Range(Vector3Int min, Vector3Int max)
     {
         return new Vector3Int(Range(min.x, max.x), Range(min.y, max.y), Range(min.z, max.z));
     }
 
-    public Vector4 Range(in Vector4 min, in Vector4 max)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector4 Range(Vector4 min, Vector4 max)
     {
         return new Vector4(Range(min.x, max.x), Range(min.y, max.y), Range(min.z, max.z), Range(min.w, max.w));
     }
 
-    public Vector2 Range(in Rect rect)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector2 Range(Rect rect)
     {
         return Range(rect.min, rect.max);
     }
 
-    public Vector3 Range(in Bounds bounds)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Vector3 Range(Bounds bounds)
     {
         return Range(bounds.min, bounds.max);
     }
