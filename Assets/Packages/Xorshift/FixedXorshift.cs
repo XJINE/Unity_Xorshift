@@ -230,5 +230,19 @@ public static class FixedXorshift
         return values;
     }
 
+    public static uint[] NativeValues(int count)
+    {
+        var localSeed = Seed;
+        var values    = new uint[count];
+
+        for (var i = 0u; i < count; i++)
+        {
+            localSeed += (i + 1) * Knuth;
+            values[i]  = GetValueNative(localSeed);
+        }
+
+        return values;
+    }
+
     #endregion Method
 }
